@@ -16,16 +16,23 @@ func LatestTag(url string, options ...Option) (string, string, error) {
 		return "", "", err
 	}
 
+	return latestTag(refs)
+}
+
+func latestTag(refs map[string]string) (string, string, error) {
 	best := version.Must(version.NewVersion("0.0.0"))
 	bestTag := ""
 	bestHash := ""
 	for r := range refs {
 		tag := strings.TrimPrefix(r, tagPrefix)
 		v, err := version.NewVersion(tag)
-		if err == nil && v.GreaterThanOrEqual(best) && v.Prerelease() == "" {
-			best = v
-			bestTag = tag
-			bestHash = refs[r]
+		if err == nil && v.Prerelease() == "" {
+			println(v.Original(), best.Original(), v.GreaterThan(best), v.Equal(best), strings.Compare(v.Original(), best.Original()) < 0)
+			if v.GreaterThan(best) || (v.Equal(best) && strings.Compare(v.Original(), best.Original()) < 0) {
+				best = v
+				bestTag = tag
+				bestHash = refs[r]
+			}
 		}
 	}
 

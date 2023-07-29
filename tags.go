@@ -27,7 +27,6 @@ func latestTag(refs map[string]string) (string, string, error) {
 		tag := strings.TrimPrefix(r, tagPrefix)
 		v, err := version.NewVersion(tag)
 		if err == nil && v.Prerelease() == "" {
-			println(v.Original(), best.Original(), v.GreaterThan(best), v.Equal(best), strings.Compare(v.Original(), best.Original()) < 0)
 			if v.GreaterThan(best) || (v.Equal(best) && strings.Compare(v.Original(), best.Original()) < 0) {
 				best = v
 				bestTag = tag

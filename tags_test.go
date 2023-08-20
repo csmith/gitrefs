@@ -11,39 +11,50 @@ const (
 func Test_latestTag(t *testing.T) {
 	tests := []struct {
 		name     string
-		args     map[string]string
+		refs     map[string]string
+		prefix   string
 		wantTag  string
 		wantHash string
 		wantErr  bool
 	}{
-		{"No refs", map[string]string{}, "", "", true},
+		{"No refs", map[string]string{}, "", "", "", true},
 		{"No tags", map[string]string{
 			"refs/heads/master": commit1,
 			"refs/heads/v1.0.0": commit2,
-		}, "", "", true},
+		}, "", "", "", true},
 		{"Single tag", map[string]string{
 			"refs/heads/master": commit1,
 			"refs/heads/v1.0.0": commit2,
 			"refs/tags/v1.0.0":  commit3,
-		}, "v1.0.0", commit3, false},
+		}, "", "v1.0.0", commit3, false},
 		{"Multiple tags", map[string]string{
 			"refs/tags/v0.9.9": commit1,
 			"refs/tags/v1.0.0": commit2,
 			"refs/tags/v1.0.1": commit3,
-		}, "v1.0.1", commit3, false},
+		}, "", "v1.0.1", commit3, false},
+		{"Multiple tags with prefix", map[string]string{
+			"refs/tags/release-0.9.9": commit1,
+			"refs/tags/release-1.0.0": commit2,
+			"refs/tags/release-1.0.1": commit3,
+		}, "release-", "release-1.0.1", commit3, false},
+		{"Multiple tags some with prefix", map[string]string{
+			"refs/tags/v0.9.9":        commit1,
+			"refs/tags/v1.0.0":        commit2,
+			"refs/tags/release-1.0.1": commit3,
+		}, "release-", "release-1.0.1", commit3, false},
 		{"Pre-release tags", map[string]string{
 			"refs/tags/v0.9.9":        commit1,
 			"refs/tags/v1.0.0-rc1":    commit2,
 			"refs/tags/v1.0.0-alpha7": commit3,
-		}, "v0.9.9", commit1, false},
+		}, "", "v0.9.9", commit1, false},
 		{"Equal tags", map[string]string{
 			"refs/tags/v1.0.0": commit1,
 			"refs/tags/1.0.0":  commit2,
-		}, "1.0.0", commit2, false},
+		}, "", "1.0.0", commit2, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tag, hash, err := latestTag(tt.args)
+			tag, hash, err := latestTag(tt.refs, tt.prefix)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("latestTag() error = %v, wantErr %v", err, tt.wantErr)
 				return

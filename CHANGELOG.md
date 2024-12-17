@@ -1,3 +1,8 @@
+# v1.3.0 (Tue Dec 17 2024)
+
+- Added `WithContext` option.
+- Minor dependency update.
+
 # v1.2.0 (Sun Aug 20 2023)
 
 - Added `GetLatestTagIgnoringPrefix`, which will ignore a user-defined prefix 

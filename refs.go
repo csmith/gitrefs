@@ -1,6 +1,7 @@
 package gitrefs
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -16,6 +17,7 @@ const (
 )
 
 type opts struct {
+	ctx      context.Context
 	client   *http.Client
 	tagsOnly bool
 }
@@ -34,9 +36,16 @@ func TagsOnly() Option {
 	}
 }
 
+func WithContext(ctx context.Context) Option {
+	return func(o *opts) {
+		o.ctx = ctx
+	}
+}
+
 // Fetch retrieves a list of all refs from the remote repository at the given url.
 func Fetch(url string, options ...Option) (map[string]string, error) {
 	o := &opts{
+		ctx:      context.Background(),
 		client:   http.DefaultClient,
 		tagsOnly: false,
 	}
@@ -45,7 +54,12 @@ func Fetch(url string, options ...Option) (map[string]string, error) {
 		options[i](o)
 	}
 
-	res, err := o.client.Get(fmt.Sprintf("%s/%s", url, refsPath))
+	req, err := http.NewRequestWithContext(o.ctx, http.MethodGet, fmt.Sprintf("%s/%s", url, refsPath), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := o.client.Do(req)
 	if err != nil {
 		return nil, err
 	}

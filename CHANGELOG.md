@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.0 - 2025-11-06
+
+- Filter out dereferenced tags (thanks @Greboid)
+
 ## 1.4.1 - 2025-08-25
 
 - Reduced minimum go version to 1.16

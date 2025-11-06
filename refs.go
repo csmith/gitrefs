@@ -95,6 +95,9 @@ func Fetch(url string, options ...Option) (map[string]string, error) {
 			parts := strings.SplitN(string(line), " ", 2)
 			hash := parts[0]
 			ref := strings.TrimSpace(strings.SplitN(parts[1], "\000", 2)[0])
+			if strings.HasSuffix(ref, "^{}") {
+				continue
+			}
 			if !o.tagsOnly || strings.HasPrefix(ref, tagPrefix) {
 				refs[ref] = hash
 			}

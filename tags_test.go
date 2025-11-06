@@ -51,6 +51,11 @@ func Test_latestTag(t *testing.T) {
 			"refs/tags/v1.0.0": commit1,
 			"refs/tags/1.0.0":  commit2,
 		}, "", "1.0.0", commit2, false},
+		{"Dereferenced tags should be filtered", map[string]string{
+			"refs/tags/v1.0.0":    commit1,
+			"refs/tags/v1.0.0^{}": commit2,
+			"refs/tags/v1.0.1":    commit3,
+		}, "", "v1.0.1", commit3, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

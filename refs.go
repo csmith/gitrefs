@@ -16,10 +16,16 @@ const (
 	tagPrefix   = "refs/tags/"
 )
 
+type auth struct {
+	Username string
+	Password string
+}
+
 type opts struct {
 	ctx      context.Context
 	client   *http.Client
 	tagsOnly bool
+	auth     *auth
 }
 
 type Option func(*opts)
@@ -42,6 +48,15 @@ func WithContext(ctx context.Context) Option {
 	}
 }
 
+func WithAuth(username string, password string) Option {
+	return func(o *opts) {
+		o.auth = &auth{
+			Username: username,
+			Password: password,
+		}
+	}
+}
+
 // Fetch retrieves a list of all refs from the remote repository at the given url.
 func Fetch(url string, options ...Option) (map[string]string, error) {
 	o := &opts{
@@ -57,6 +72,10 @@ func Fetch(url string, options ...Option) (map[string]string, error) {
 	req, err := http.NewRequestWithContext(o.ctx, http.MethodGet, fmt.Sprintf("%s/%s", url, refsPath), nil)
 	if err != nil {
 		return nil, err
+	}
+
+	if o.auth != nil {
+		req.SetBasicAuth(o.auth.Username, o.auth.Password)
 	}
 
 	res, err := o.client.Do(req)

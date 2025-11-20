@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.0 - 2025-11-20
+
+- Added `WithAuth` option to pass basic auth credentials.
+
 ## 1.5.0 - 2025-11-06
 
 - Filter out dereferenced tags (thanks @Greboid)
